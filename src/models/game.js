@@ -10,17 +10,22 @@ class Game {
 
     this.interval = null;
 
+    this.scoreboard = document.getElementById("score");
+    this.score = 0;
+
     this.board = new Board(this.ctx);
     this.pacman = new Pacman(this.ctx, pacmanInitX, pacmanInitY, pacmanWidth, pacmanHeight);
+    this.ghost = new Ghost(this.ctx, ghost1InitX, ghost1InitY, ghost1Width, ghost1Height); 
   }
 
   start() {
     this.interval = setInterval(() => {
       this.clear();
-      this.draw();
       this.move(this.board.tileSet);
       this.checksCollisions();
       this.checkPacmanInsideBoard();
+      this.checkScore();
+      this.draw();
 
     }, 1000 / fps);
     
@@ -30,6 +35,7 @@ class Game {
   draw() {
     this.board.draw();
     this.pacman.draw();
+    this.ghost.draw();
   }
 
   clear() {
@@ -42,18 +48,42 @@ class Game {
 
   move() {
     this.pacman.move(this.board.tileSet);
+    this.ghost.move(this.board.tileSet, this.pacman);
   }
 
   checksCollisions() {
-    this.checkPacmanCollisions();
-    this.pacman.eatsFood(this.board.tileSet);
+    this.checkPacmanWallsCollisions();
+    this.checkPacmanEatsFood();
   }
 
-  checkPacmanCollisions() {
-    if(this.pacman.collidesWall(this.board.tileSet)){
+  checkPacmanWallsCollisions() {
+    if (this.pacman.collidesWall(this.board.tileSet)) {
       this.pacman.vx = 0;
       this.pacman.vy = 0;
     };
+  }
+
+  checkPacmanEatsFood() {
+    const newTileSet = this.board.tileSet.reduce((reducedTileset, currentTile) => {
+      if (currentTile instanceof Wall || (currentTile instanceof Food && !this.pacman.eatsFood(currentTile))) {
+        reducedTileset.push(currentTile);
+      } else {
+        // adds the value of the food eaten to the score
+        this.score += currentTile.value;
+      }
+      return reducedTileset;
+    }, []);
+
+    this.board.tileSet = newTileSet;
+
+  }
+
+  checkScore() {
+    this.drawScore();
+  }
+
+  drawScore() {
+    this.scoreboard.innerText = this.score;
   }
 
   checkPacmanInsideBoard() {
