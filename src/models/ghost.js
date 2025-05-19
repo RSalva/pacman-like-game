@@ -32,9 +32,10 @@ class Ghost {
     this.posibleDirections = [];
     this.checkPossibleMovements(tileSet);
     this.cantGoBack();
-    
+    console.log(this.movementFrame);
+    console.log(this.posibleDirections);
     if (this.movementFrame > 25) {
-      this.chooseNewDirection();
+      this.chooseNewDirection(pacman);
       this.movementFrame = 1;
     }
     this.movementFrame++;
@@ -64,7 +65,8 @@ class Ghost {
     this.y += this.vy;
   }
 
-  chooseNewDirection() {
+  chooseNewDirection(pacman) {
+    this.chooseBestDirection(pacman);
     const options = this.posibleDirections.length;
     this.currentMovement = this.posibleDirections[Math.floor(Math.random() * options)];
   }
@@ -86,6 +88,7 @@ class Ghost {
           if (dir !== "Left") {
             newDirArr.push(dir);
           }
+          console.log("Pacman down");
           return newDirArr;
         }, []);
         break;
@@ -155,5 +158,55 @@ class Ghost {
     return collision;
   }
 
+  chooseBestDirection(pacman) {
+    const distX = pacman.x - this.x;
+    const distY = pacman.y - this.y;
+    
+    if (distX <= 0 && this.posibleDirections.some(dir => dir === "Left")) {
+      this.posibleDirections = this.posibleDirections.reduce((newDirArr, dir) => {
+        if (dir !== "Right") {
+          newDirArr.push(dir);
+        }
+        return newDirArr;
+      }, []);
+    } else if (distX > 0 && this.posibleDirections.some(dir=> dir === "Right")) {
+      this.posibleDirections = this.posibleDirections.reduce((newDirArr, dir) => {
+        if (dir !== "Left") {
+          newDirArr.push(dir);
+        }
+        return newDirArr;
+      }, []);
+    }
+
+    if (distY <= 0 && this.posibleDirections.some(dir=> dir === "Up")) {
+      this.posibleDirections = this.posibleDirections.reduce((newDirArr, dir) => {
+        if (dir !== "Down") {
+          newDirArr.push(dir);
+        }
+        return newDirArr;
+      }, []);
+    } else if (distY <= 0 && this.posibleDirections.some(dir=> dir === "Down")) {
+      this.posibleDirections = this.posibleDirections.reduce((newDirArr, dir) => {
+        if (dir !== "Up") {
+          newDirArr.push(dir);
+        }
+        return newDirArr;
+      }, []);
+    }
+  }
+
+  exitsBoard(board) {
+    if (this.x >= board.w){
+      //console.log("Exited from the right");
+      // debugger;
+      this.x = 1 - this.w;
+      this.movementFrame = 2;
+    } else if (this.x + this.w <= 0) {
+      // debugger;
+      //console.log("Exited from the left");
+      this.x = board.w - 1;
+      this.movementFrame = 2;
+    }
+  }
 
 }

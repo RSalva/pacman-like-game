@@ -21,9 +21,9 @@ class Game {
   start() {
     this.interval = setInterval(() => {
       this.clear();
+      this.checkAllInsideBoard();
       this.move(this.board.tileSet);
       this.checksCollisions();
-      this.checkPacmanInsideBoard();
       this.checkScore();
       this.draw();
 
@@ -86,8 +86,9 @@ class Game {
     this.scoreboard.innerText = this.score;
   }
 
-  checkPacmanInsideBoard() {
+  checkAllInsideBoard() {
     this.pacman.exitsBoard(this.board);
+    this.ghost.exitsBoard(this.board);
   }
   
 }
