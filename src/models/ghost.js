@@ -14,8 +14,11 @@ class Ghost {
 
     this.ghostColor = ghostColor;
 
-    this.forbiddenDirections = [];
+    this.posibleDirections = [];
     this.currentMovement = "Right";
+
+    this.movementFrame = 1;
+
   }
 
   draw() {
@@ -25,71 +28,132 @@ class Ghost {
     this.ctx.restore();
   }
 
-  banDirection(direction) {
-    this.forbiddenDirections.push(direction);
-  }
-
-  clearForbiddenDirections() {
-    this.forbiddenDirections = [];
-  }
-
-  checkIfCanMoveY() {
-    
-  }
-
   move(tileSet, pacman) {
-    if (this.collidesWall(tileSet)) {
-      this.checkIfCanMoveY();
+    this.posibleDirections = [];
+    this.checkPossibleMovements(tileSet);
+    this.cantGoBack();
+    
+    if (this.movementFrame > 25) {
+      this.chooseNewDirection();
+      this.movementFrame = 1;
     }
-    switch (this.currentMovement) {
-      case "Up":
-        this.moveUp(tileSet);
-        break;
-      case "Down":
-        this.moveDown(tileSet);
+    this.movementFrame++;
+
+    switch(this.currentMovement) {
+      case "Right":
+        this.vx = movementSpeed;
+        this.vy = 0;
         break;
       case "Left":
-        this.moveLeft(tileSet);
+        this.vx = - movementSpeed;
+        this.vy = 0;
         break;
-      case "Right":
-        this.moveRight(tileSet);
+      case "Up":
+        this.vx = 0;
+        this.vy = - movementSpeed;
+        break;
+      case "Down":
+        this.vx = 0;
+        this.vy = movementSpeed;
         break;
       default:
         break;
     }
+
     this.x += this.vx;
     this.y += this.vy;
   }
 
-  moveRight(tileSet) {
-    this.vx = movementSpeed;
+  chooseNewDirection() {
+    const options = this.posibleDirections.length;
+    this.currentMovement = this.posibleDirections[Math.floor(Math.random() * options)];
   }
 
-  moveLeft(tileSet) {
-    this.vx = - movementSpeed;
-  }
-
-  collidesWall(tileSet) {
-    let collides = false;
-    tileSet.forEach(tile => {
-      if (tile !== undefined) {
-        if (tile instanceof Wall) {
-          // Checks if the next move (meanig actual x or y plus the vx or vy) is gonna collide
-          // colX = tile left side <= pacman right side + vx & tile right side >= pacman left side + vx
-          const colX = tile.x + gameMargin <= this.x + this.w + this.vx && tile.x + tile.w - gameMargin >= this.x + this.vx;
-  
-          // colY = tile bottom side >= pacman top side + vy & tile top side <= pacman bottom side + vy
-          const colY = tile.y + tile.h - gameMargin >= this.y + this.vy && tile.y + gameMargin <= this.y + this.h + this.vy;
-  
-          if(colX && colY) {
-            collides = true;
-            this.banDirection(this.currentMovement);
-          }
-        }
+  checkPossibleMovements(tileSet) {
+    const allDirections = ["Right", "Left", "Up", "Down"];
+    allDirections.forEach(dir => {
+      if(!this.collidesWithWallsInDirection(tileSet, dir)) {
+        this.posibleDirections.push(dir);
       }
-      
     });
-    return collides;
+    //console.log(this.posibleDirections);
   }
+
+  cantGoBack() {
+    switch(this.currentMovement) {
+      case "Right":
+        this.posibleDirections = this.posibleDirections.reduce((newDirArr, dir) => {
+          if (dir !== "Left") {
+            newDirArr.push(dir);
+          }
+          return newDirArr;
+        }, []);
+        break;
+      case "Left":
+        this.posibleDirections = this.posibleDirections.reduce((newDirArr, dir) => {
+          if (dir !== "Right") {
+            newDirArr.push(dir);
+          }
+          return newDirArr;
+        }, []);
+        break;
+      case "Up":
+        this.posibleDirections = this.posibleDirections.reduce((newDirArr, dir) => {
+          if (dir !== "Down") {
+            newDirArr.push(dir);
+          }
+          return newDirArr;
+        }, []);
+        break;
+      case "Down":
+        this.posibleDirections = this.posibleDirections.reduce((newDirArr, dir) => {
+          if (dir !== "Up") {
+            newDirArr.push(dir);
+          }
+          return newDirArr;
+        }, []);
+        break;
+      default:
+        break;
+    }
+    // console.log(this.posibleDirections);
+  }
+
+  collidesWithWallsInDirection(tileSet, direction) {
+    let dirX = 0;
+    let dirY = 0;
+    switch(direction) {
+      case "Right":
+        dirX = 1;
+        break;
+      case "Left":
+        dirX = -1;
+        break;
+      case "Up":
+        dirY = -1;
+        break;
+      case "Down":
+        dirY = 1;
+        break;
+      default:
+        break;
+    }
+    let collision = false;
+    tileSet.forEach(tile => {
+      if (tile instanceof Wall) {
+        const colX = 
+          tile.x < this.x + this.w + dirX &&
+          tile.x + tile.w > this.x + dirX;
+        const colY = 
+          tile.y < this.y + this.h + dirY &&
+          tile.y + tile.h > this.y + dirY;
+        if (colX && colY) {
+          collision = true;
+        }
+      } 
+    });
+    return collision;
+  }
+
 
 }
