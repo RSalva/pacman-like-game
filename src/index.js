@@ -68,7 +68,7 @@ function mainScreen() {
     livesText.classList.add("align-middle", "mr-2");
     livesText.innerText = "Lives:";
   const liveImgOne = document.createElement("img");
-    liveImgOne.src = "assets/images/pacman_live.png";
+    liveImgOne.src = "../assets/images/pacman_live.png";
     liveImgOne.alt = "pacman-live-img";
   const liveImgTwo = document.createElement("img");
     liveImgTwo.src = liveImgOne.src;
@@ -92,7 +92,7 @@ function mainScreen() {
 }
 
 function gameOverScreen() {
-  
+
 }
 
 /*

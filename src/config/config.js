@@ -10,9 +10,9 @@ const gameMargin = 1;
 // game config
 const fps = 60;
 const movementSpeed = 1;
-const backgroundMusicPath = "./assets/sounds/music.mp3";
-const eatFoodMusicPath = "./assets/sounds/eat_ball.mp3";
-const dieMusicPath = "./assets/sounds/die.mp3";
+const backgroundMusicPath = "../../assets/sounds/music.mp3";
+const eatFoodMusicPath = "../../assets/sounds/eat_ball.mp3";
+const dieMusicPath = "../../assets/sounds/die.mp3";
 const volume = 0.05;
 
 // pacman config
@@ -30,5 +30,5 @@ const ghostsColors = ["Red", "Pink", "LightBlue", "Yellow"];
 const numberOfGhosts = 4;
 
 // liveBoard
-const livesSrc = ".assets/images/pacman_live.png";
+const livesSrc = "../../assets/images/pacman_live.png";
 const livesAlt = "pacman-live-img";
