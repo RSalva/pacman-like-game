@@ -8,7 +8,7 @@
 }
 
 html, body {
-  background-image: url("./assets/images/main-background.jpg");
+  background-image: url("../../assets/images/main-background.jpg");
   height: 100%;
   padding-bottom: 2%;
 }
@@ -19,7 +19,7 @@ html, body {
 }
 
 #home-screen {
-  background-image: url("./assets/images/pacman-wallpaper.jpg");
+  background-image: url("../../assets/images/pacman-wallpaper.jpg");
 }
 
 #start-button {
