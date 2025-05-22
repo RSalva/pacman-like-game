@@ -140,7 +140,7 @@ class Game {
     if (this.pacman.lives > 0) {
       for(let i = 0; i < this.pacman.lives; i++) {
         const liveImg = document.createElement("img");
-          liveImg.src = "../../assets/images/pacman_live.png";
+          liveImg.src = "./assets/images/pacman_live.png";
           liveImg.alt = "pacman-live-img";
         this.livesBoard.appendChild(liveImg);
       }
