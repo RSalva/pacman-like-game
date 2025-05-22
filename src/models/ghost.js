@@ -15,7 +15,7 @@ class Ghost {
     this.ghostColor = ghostColor;
 
     this.posibleDirections = [];
-    this.currentMovement = "Right";
+    this.currentMovement = "Up";
 
     this.movementFrame = 1;
 
@@ -32,9 +32,13 @@ class Ghost {
     this.posibleDirections = [];
     this.checkPossibleMovements(tileSet);
     this.cantGoBack();
-    console.log(this.movementFrame);
-    console.log(this.posibleDirections);
-    if (this.movementFrame > 25) {
+    if (this.behaviour === "waiting") {
+      this.waiting(tileSet);
+    }
+    
+    // console.log(this.movementFrame);
+    // console.log(this.posibleDirections);
+    if (this.movementFrame > tileSize) {
       this.chooseNewDirection(pacman);
       this.movementFrame = 1;
     }
@@ -88,7 +92,6 @@ class Ghost {
           if (dir !== "Left") {
             newDirArr.push(dir);
           }
-          console.log("Pacman down");
           return newDirArr;
         }, []);
         break;
@@ -163,35 +166,15 @@ class Ghost {
     const distY = pacman.y - this.y;
     
     if (distX <= 0 && this.posibleDirections.some(dir => dir === "Left")) {
-      this.posibleDirections = this.posibleDirections.reduce((newDirArr, dir) => {
-        if (dir !== "Right") {
-          newDirArr.push(dir);
-        }
-        return newDirArr;
-      }, []);
+      this.posibleDirections = ["Left"];
     } else if (distX > 0 && this.posibleDirections.some(dir=> dir === "Right")) {
-      this.posibleDirections = this.posibleDirections.reduce((newDirArr, dir) => {
-        if (dir !== "Left") {
-          newDirArr.push(dir);
-        }
-        return newDirArr;
-      }, []);
+      this.posibleDirections = ["Right"];
     }
 
     if (distY <= 0 && this.posibleDirections.some(dir=> dir === "Up")) {
-      this.posibleDirections = this.posibleDirections.reduce((newDirArr, dir) => {
-        if (dir !== "Down") {
-          newDirArr.push(dir);
-        }
-        return newDirArr;
-      }, []);
+      this.posibleDirections = ["Up"];
     } else if (distY <= 0 && this.posibleDirections.some(dir=> dir === "Down")) {
-      this.posibleDirections = this.posibleDirections.reduce((newDirArr, dir) => {
-        if (dir !== "Up") {
-          newDirArr.push(dir);
-        }
-        return newDirArr;
-      }, []);
+      this.posibleDirections = ["Down"];
     }
   }
 
@@ -207,6 +190,39 @@ class Ghost {
       this.x = board.w - 1;
       this.movementFrame = 2;
     }
+  }
+
+  waiting(tileSet) {
+    this.posibleDirections = ["Up", "Down"];
+    const randChoice = Math.floor(Math.random() * 2);
+    // console.log(randChoice);
+    if (randChoice === 0) {
+      if (this.collidesWithWallsInDirection(tileSet, this.posibleDirections[randChoice])) {
+        this.posibleDirections = [this.posibleDirections[1]];
+      } else {
+        this.posibleDirections = [this.posibleDirections[0]];
+      }
+    } else {
+      if (this.collidesWithWallsInDirection(tileSet, this.posibleDirections[randChoice])) {
+        this.posibleDirections = [this.posibleDirections[0]];
+      } else {
+        this.posibleDirections = [this.posibleDirections[1]];
+      }
+    }
+  }
+
+  killed() {
+    this.behaviour = "waiting";
+    this.x = ghost1InitX + tileSize;
+    this.y = ghost1InitY;
+  }
+
+  startMoving() {
+    this.x = tileSize * 14;
+    this.y = tileSize * 11;
+    this.currentMovement = "Right";
+    this.movementFrame = 1;
+    this.behaviour = "chasing";
   }
 
 }

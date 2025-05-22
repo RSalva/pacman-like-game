@@ -74,6 +74,8 @@ class Board {
         case 2:
           tile = new Food(this.ctx, tileX + tileSize / 4, tileY + tileSize / 4, tileSize/2, tileSize/2, true, 1000);
           break;
+        case 3:
+          tile = new Door(this.ctx, tileX, tileY, tileSize, tileSize, "pink");
         default:
           break;
       }
